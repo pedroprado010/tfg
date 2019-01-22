@@ -45,5 +45,6 @@ app.post(
   [authMiddleware],
   loanController.returnExemplar
 );
+app.get('/account/loan', [authMiddleware], loanController.listLoans);
 
 app.listen(3000);

@@ -16,6 +16,7 @@ const loanHistoricSchema = new mongoose.Schema({
     required: true,
   },
   end: Date,
+  penalty: Number
 });
 
 const LoanHistoric = mongoose.model('LoanHistoric', loanHistoricSchema);

@@ -1,11 +1,15 @@
+const moment = require('moment');
+
 const LoanHistoric = require('../models/loan-historic');
 const Book = require('../models/book');
 const Exemplar = require('../models/exemplar');
 
+const constants = require('../lib/constants');
+
 function loanExemplar(req, res) {
   Promise.all([
-    Book.findById(req.params.book_id).exec(),
-    Exemplar.findById(req.params.exemplar_id).exec(),
+    Book.findById(req.params.book_id),
+    Exemplar.findById(req.params.exemplar_id),
   ])
     .then(results => {
       const book = results[0];
@@ -19,10 +23,7 @@ function loanExemplar(req, res) {
         lodger: req.token.id,
         start: Date.now(),
       });
-      return Promise.all([
-        newLoan.save(),
-        exemplar.update({ loaned: true }).exec(),
-      ]);
+      return Promise.all([newLoan.save(), exemplar.update({ loaned: true })]);
     })
     .then(results => {
       res.json({ loan: results[0], exemplar: results[1] });
@@ -36,22 +37,35 @@ function loanExemplar(req, res) {
 }
 
 function returnExemplar(req, res) {
-  Exemplar.findById(req.params.exemplar_id)
-    .exec()
-    .then(exemplar => {
+  Promise.all([
+    LoanHistoric.findOne({
+      lodger: req.token.id,
+      exemplar_id: req.params.exemplar_id,
+      end: { $exists: false },
+    }),
+    Exemplar.findById(req.params.exemplar_id),
+  ])
+    .then(result => {
+      const loan = result[0];
+      const exemplar = result[1];
+
+      if (!loan || !exemplar)
+        throw new Error('Exemplar não existe ou não está emprestado');
       if (!exemplar.loaned)
         throw new Error('Esse exemplar não esta emprestado.');
 
+      let __update_fields = { end: Date.now() };
+      const s_day = moment(loan.start);
+      const e_day = moment(__update_fields.end);
+      const diff_days = e_day.diff(s_day, 'days');
+
+      if (diff_days > constants.LOAN_DAY_LIMIT) {
+        __update_fields.penalty = constants.LOAN_PENALTY_PER_DAY * diff_days;
+      }
+
       return Promise.all([
-        LoanHistoric.findOneAndUpdate(
-          {
-            lodger: req.token.id,
-            exemplar_id: req.params.exemplar_id,
-            end: { $exists: false },
-          },
-          { end: Date.now() }
-        ),
-        exemplar.update({ loaned: false }).exec(),
+        loan.update(__update_fields),
+        exemplar.update({ loaned: false }),
       ]);
     })
     .then(result => {
@@ -66,4 +80,21 @@ function returnExemplar(req, res) {
     });
 }
 
-module.exports = { loanExemplar, returnExemplar };
+function listLoans(req, res) {
+  LoanHistoric.find(
+    {
+      lodger: req.token.id,
+      end: { $exists: false },
+    },
+    '-lodger',
+    { lean: true, limit: 10 }
+  )
+    .then(loans => {
+      res.json(loans);
+    })
+    .catch(error => {
+      res.status(500).json({ error });
+    });
+}
+
+module.exports = { loanExemplar, returnExemplar, listLoans };
