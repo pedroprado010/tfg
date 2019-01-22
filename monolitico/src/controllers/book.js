@@ -30,22 +30,22 @@ function listExemplars(req, res) {
   Book.findById(req.params.book_id, {}, { lean: true })
     .exec()
     .then(book => {
+      if (!book)
+        return res.status(404).json({ error: 'Livro não cadastrado.' });
       Exemplar.find({ book_id: req.params.book_id }, '-book_id')
         .exec()
         .then(docs => {
           book.exemplars = docs;
           res.json(book);
         })
-        .catch(err => {
-          res.json({ ruim: 'sim' });
+        .catch(error => {
+          res.json({ error });
         });
+    })
+    .catch(error => {
+      res.status(400).json({ error });
     });
 }
 
-function loanExemplar(req, res) {
-  res.json(req.params);
-  console.log(req.params.book_id);
-  console.log(req.params.exemplar_id);
-}
 
-module.exports = { listBooks, listExemplars, loanExemplar };
+module.exports = { listBooks, listExemplars };

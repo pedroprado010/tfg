@@ -7,6 +7,9 @@ const app = express();
 const homeController = require('./controllers/home');
 const accountControler = require('./controllers/account');
 const bookControler = require('./controllers/book');
+const loanController = require('./controllers/loan');
+
+const authMiddleware = require('./lib/jwt-middleware');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
@@ -31,6 +34,12 @@ app.post('/account/login', accountControler.authenticate);
 
 app.get('/books', bookControler.listBooks);
 app.get('/books/:book_id/exemplar', bookControler.listExemplars);
-app.get('/books/:book_id/exemplar/:exemplar_id', bookControler.loanExemplar);
+
+// app.get('/loan/:book_id/:exemplar_id', loanController.loanExemplar);
+app.post(
+  '/loan/:book_id/:exemplar_id',
+  [authMiddleware],
+  loanController.loanExemplar
+);
 
 app.listen(3000);
