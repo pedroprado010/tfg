@@ -8,20 +8,22 @@
 </header>
 
 <main>
+<form action="/account/login" method="POST">
   <fieldset>
     <legend>Login</legend>
     <div>
       <label for="usr-email">Email:</label>
-      <input id="usr-email" type="email">
+      <input id="usr-email" type="email" name="email">
     </div>
     <div>
       <label for="usr-pwd">Senha:</label>
-      <input type="password">
+      <input type="password" id="usr-pwd" name="password">
     </div>
     <div>
       <button type="submit"> Entrar </button>
     </div>
   </fieldset>
+</form>
 </main>
 
 <footer>

@@ -12,17 +12,25 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://mongo:27017/tfg-db', { useNewUrlParser: true }, (err) => {
-  if (err) {
-    console.log('Erro ao conectar ao db');
+mongoose.connect(
+  'mongodb://mongo:27017/tfg-db',
+  { useNewUrlParser: true },
+  err => {
+    if (err) {
+      console.log('Erro ao conectar ao db');
+    }
   }
-});
+);
 
 app.get('/', homeController.index);
+
 app.get('/account/register', accountControler.registerAccountPage);
 app.post('/account/register', accountControler.registerAccount);
 app.get('/account', accountControler.listAccounts);
+app.post('/account/login', accountControler.authenticate);
+
 app.get('/books', bookControler.listBooks);
 app.get('/books/:book_id/exemplar', bookControler.listExemplars);
+app.get('/books/:book_id/exemplar/:exemplar_id', bookControler.loanExemplar);
 
 app.listen(3000);

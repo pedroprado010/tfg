@@ -8,29 +8,44 @@ function listBooks(req, res) {
       res.json({ erro: err });
     } else {
       const _q = docs.map((doc, i) => {
-        return Exemplar.find({ book_id: doc._id }, '_id').exec().then(exemplars => {
-          docs[i].exemplars = exemplars;
-        });
+        return Exemplar.find({ book_id: doc._id }, '_id')
+          .exec()
+          .then(exemplars => {
+            docs[i].exemplars = exemplars;
+          });
       });
-      Promise.all(_q).then(r => {
-        res.json({ docs });
-      }).catch(err => {
-        console.log(err);
-        res.json({ err: 'deu rui' });
-      })
+      Promise.all(_q)
+        .then(r => {
+          res.json({ docs });
+        })
+        .catch(err => {
+          console.log(err);
+          res.json({ err: 'deu rui' });
+        });
     }
   });
 }
 
 function listExemplars(req, res) {
-  Book.findById(req.params.book_id, {}, { lean: true }).exec().then(book => {
-    Exemplar.find({ book_id: req.params.book_id }, '-book_id').exec().then(docs => {
-      book.exemplars = docs;
-      res.json(book);
-    }).catch(err => {
-      res.json({ ruim: 'sim' })
+  Book.findById(req.params.book_id, {}, { lean: true })
+    .exec()
+    .then(book => {
+      Exemplar.find({ book_id: req.params.book_id }, '-book_id')
+        .exec()
+        .then(docs => {
+          book.exemplars = docs;
+          res.json(book);
+        })
+        .catch(err => {
+          res.json({ ruim: 'sim' });
+        });
     });
-  })
 }
 
-module.exports = { listBooks, listExemplars }
+function loanExemplar(req, res) {
+  res.json(req.params);
+  console.log(req.params.book_id);
+  console.log(req.params.exemplar_id);
+}
+
+module.exports = { listBooks, listExemplars, loanExemplar };
