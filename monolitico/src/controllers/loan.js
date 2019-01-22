@@ -2,10 +2,6 @@ const LoanHistoric = require('../models/loan-historic');
 const Book = require('../models/book');
 const Exemplar = require('../models/exemplar');
 
-function loanExemplarPage(req, res) {
-  res.render('loan-exemplar');
-}
-
 function loanExemplar(req, res) {
   Promise.all([
     Book.findById(req.params.book_id).exec(),
@@ -32,9 +28,42 @@ function loanExemplar(req, res) {
       res.json({ loan: results[0], exemplar: results[1] });
     })
     .catch(error => {
-      console.log(error);
-      res.status(500).json({ error: error.message || error });
+      res.status(500);
+      if (error) return res.json({ error: error.message || error });
+
+      return res.json({ error: 'Não foi possível emprestar o livro.' });
     });
 }
 
-module.exports = { loanExemplar, loanExemplarPage };
+function returnExemplar(req, res) {
+  Exemplar.findById(req.params.exemplar_id)
+    .exec()
+    .then(exemplar => {
+      if (!exemplar.loaned)
+        throw new Error('Esse exemplar não esta emprestado.');
+
+      return Promise.all([
+        LoanHistoric.findOneAndUpdate(
+          {
+            lodger: req.token.id,
+            exemplar_id: req.params.exemplar_id,
+            end: { $exists: false },
+          },
+          { end: Date.now() }
+        ),
+        exemplar.update({ loaned: false }).exec(),
+      ]);
+    })
+    .then(result => {
+      console.log(result);
+      res.json({ loan: result[0], exemplar: result[1] });
+    })
+    .catch(error => {
+      res.status(500);
+      if (error) return res.json({ error: error.message || error });
+
+      res.json({ error: 'Não foi possível devolver o livro' });
+    });
+}
+
+module.exports = { loanExemplar, returnExemplar };

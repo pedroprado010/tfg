@@ -35,11 +35,15 @@ app.post('/account/login', accountControler.authenticate);
 app.get('/books', bookControler.listBooks);
 app.get('/books/:book_id/exemplar', bookControler.listExemplars);
 
-// app.get('/loan/:book_id/:exemplar_id', loanController.loanExemplar);
 app.post(
   '/loan/:book_id/:exemplar_id',
   [authMiddleware],
   loanController.loanExemplar
+);
+app.post(
+  '/return/:book_id/:exemplar_id',
+  [authMiddleware],
+  loanController.returnExemplar
 );
 
 app.listen(3000);
