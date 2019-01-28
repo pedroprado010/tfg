@@ -1,8 +1,6 @@
+const jwt = require('jsonwebtoken');
 const Account = require('../models/account');
-
-function registerAccountPage(req, res) {
-  res.render('account/register');
-}
+const JWT_KEY = require('../lib/constants').JWT_KEY;
 
 function registerAccount(req, res) {
   console.log(req.body);
@@ -10,22 +8,35 @@ function registerAccount(req, res) {
     email: req.body.email,
     password: req.body.pwd,
   });
-  account.save(err => {
-    if (err) {
-      // console.log('DEU RUIM ', err);
-      res.status(500).json({ error: err });
-      return;
-    }
-    res.json({email: req.body.email});
-  });
+  account
+    .save()
+    .then(account => {
+      res.json({ email: account.email });
+    })
+    .catch(e => {
+      res.status(500).json({
+        error: Object.getOwnPropertyNames(e.errors).reduce((acc, curr) => {
+          return [...acc, e.errors[curr].message];
+        }, []),
+      });
+    });
 }
 
 function listAccounts(req, res) {
-  Account.find({}, (err, docs) => {
-    if (!err) {
-      res.render('account/list', { accounts: docs });
-    }
-  });
+  Account.find({}, {}, { lean: true })
+    .then(accs => {
+      res.json(accs);
+    })
+    .catch(e => {
+      res.status(500);
+      if (e)
+        res.json({
+          error: Object.getOwnPropertyNames(e.errors).reduce((acc, curr) => {
+            return [...acc, e.errors[curr].message];
+          }, []),
+        });
+      res.json({ error: 'Unknow error.' });
+    });
 }
 
 function authenticate(req, res) {
@@ -41,9 +52,19 @@ function authenticate(req, res) {
     });
 }
 
+function isAuthenticated(req, res) {
+  if (!req.headers.authorization)
+    return res.status(403).json({ error: 'Credenciais não enviadas.' });
+
+  jwt.verify(req.headers.authorization, JWT_KEY, (err, decoded) => {
+    if (err) return res.status(400).json({ error: 'Credenciais inválidas.' });
+    res.status(200).json({ token: decoded });
+  });
+}
+
 module.exports = {
-  registerAccountPage,
   registerAccount,
   listAccounts,
   authenticate,
+  isAuthenticated,
 };

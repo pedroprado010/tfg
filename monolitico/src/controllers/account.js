@@ -9,14 +9,18 @@ function registerAccount(req, res) {
     email: req.body.email,
     password: req.body.pwd,
   });
-  account.save(err => {
-    if (err) {
-      // console.log('DEU RUIM ', err);
-      res.status(500).json({ error: err });
-      return;
-    }
-    res.json({email: req.body.email});
-  });
+  account
+    .save()
+    .then(account => {
+      res.json({ email: account.email });
+    })
+    .catch(e => {
+      res.status(500).json({
+        error: Object.getOwnPropertyNames(e.errors).reduce((acc, curr) => {
+          return [...acc, e.errors[curr].message];
+        }, []),
+      });
+    });
 }
 
 function listAccounts(req, res) {
