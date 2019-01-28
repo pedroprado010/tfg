@@ -8,7 +8,7 @@ function listBooks(req, res) {
       res.json({ erro: err });
     } else {
       const _q = docs.map((doc, i) => {
-        return Exemplar.find({ book_id: doc._id }, '_id')
+        return Exemplar.find({ book_id: doc._id }, '_id loaned')
           .exec()
           .then(exemplars => {
             docs[i].exemplars = exemplars;

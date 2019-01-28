@@ -1,0 +1,38 @@
+version: '3'
+services:
+  reverse_proxy:
+    depends_on:
+      - account_app
+      - books_app
+      - loan_app
+    image: nginx:1.15.8
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
+  account_app:
+    build: ./account_app
+    expose:
+      - "3000"
+    volumes:
+      - ./account_app:/usr/src/app
+  books_app:
+    build: ./books_app
+    expose:
+      - "3000"
+    volumes:
+      - ./books_app:/usr/src/app
+  loan_app:
+    build: ./loan_app
+    expose:
+      - "3000"
+    volumes:
+      - ./loan_app:/usr/src/app
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ../monolitico/data:/data/db
+    ports:
+      - "27017:27017"
