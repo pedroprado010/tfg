@@ -1,8 +1,34 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const app = express();
 
-app.all('/loan', (req, res) => {
-  res.json({loan: 'app'});
-});
+const loanController = require('./controllers/loan');
+
+const authMiddleware = require('./lib/jwt-middleware');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+mongoose.connect(
+  'mongodb://mongo:27017/tfg-db',
+  { useNewUrlParser: true },
+  err => {
+    if (err) {
+      console.log('Erro ao conectar ao db');
+    }
+  }
+);
+
+app.get(
+  '/loan/:book_id/:exemplar_id',
+  [authMiddleware],
+  loanController.loanExemplar
+);
+app.put(
+  '/loan/:book_id/:exemplar_id',
+  [authMiddleware],
+  loanController.returnExemplar
+);
+app.get('/loan', [authMiddleware], loanController.listLoans);
 
 app.listen(3000);
