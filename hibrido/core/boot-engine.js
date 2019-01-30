@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const configs = require('./configs');
+const is_command = require('./validators/is-command');
+const { cache } = require('./global-commands/register');
+const { CREATE_MODEL } = require('./global-commands/action-types');
 
-const register_cache = [];
-
-const CREATE_MODEL = 1;
 
 function boot() {
-  const generators = register_cache.map(f => f());
+  const generators = cache.map(f => f());
   let gen = null;
   let _nxt = null;
   let _args = null;
@@ -14,7 +14,7 @@ function boot() {
     gen = generators.pop();
     _nxt = gen.next(_args);
     if (_nxt.done) continue;
-    if (typeof _nxt.value === 'object' && !!_nxt.value.action) {
+    if (is_command(_nxt.value)) {
       switch (_nxt.value.action) {
         case CREATE_MODEL: {
           const { name, schema, statics } = _nxt.value.payload;
@@ -34,14 +34,3 @@ function boot() {
 }
 
 module.exports = boot;
-
-global.register = function(fn) {
-  register_cache.push(fn);
-};
-
-global.create_model = function(name, schema, statics) {
-  return {
-    action: CREATE_MODEL,
-    payload: { name, schema, statics },
-  };
-};
