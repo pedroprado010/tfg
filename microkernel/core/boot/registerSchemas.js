@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const configs = require('./configs');
+const jwt = require('jsonwebtoken');
+const JWT_KEY = require('./constants').JWT_KEY;
 
 const bookSchema = new mongoose.Schema({
   title: {
