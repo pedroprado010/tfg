@@ -3,7 +3,7 @@ const configs = require('./configs');
 const is_command = require('./validators/is-command');
 const { cache } = require('./global-commands/register');
 const { CREATE_MODEL } = require('./global-commands/action-types');
-
+const { pre_create_model_cache } = require('./global-commands/model-commands');
 
 function boot() {
   const generators = cache.map(f => f());
@@ -18,7 +18,11 @@ function boot() {
       switch (_nxt.value.action) {
         case CREATE_MODEL: {
           const { name, schema, statics } = _nxt.value.payload;
-          console.log(`Creating model ${name}`);
+          if (pre_create_model_cache.has(name)) {
+            pre_create_model_cache.get(name).forEach(hook => {
+              hook(schema, statics);
+            });
+          }
           const mongoose_schema = new mongoose.Schema(schema);
 
           !!statics && (mongoose_schema.statics = statics);

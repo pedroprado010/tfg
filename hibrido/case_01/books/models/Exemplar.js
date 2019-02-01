@@ -5,10 +5,6 @@ const schema = {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Book',
   },
-  loaned: {
-    type: Boolean,
-    default: false,
-  },
 };
 
 const name = 'Exemplar';
