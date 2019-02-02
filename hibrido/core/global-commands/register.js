@@ -1,4 +1,5 @@
 require('./model-commands');
+require('./routing-commands');
 
 const cache = [];
 

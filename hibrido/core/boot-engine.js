@@ -2,22 +2,45 @@ const mongoose = require('mongoose');
 const configs = require('./configs');
 const is_command = require('./validators/is-command');
 const { cache } = require('./global-commands/register');
-const { CREATE_MODEL } = require('./global-commands/action-types');
+const {
+  CREATE_MODEL,
+  DEPENDS_ON_MODEL,
+  CREATE_ROUTE,
+  CREATE_MIDDLEWARE,
+  DEPENDS_ON_MIDDLEWARE,
+} = require('./global-commands/action-types');
 const { pre_create_model_cache } = require('./global-commands/model-commands');
 
 function boot() {
-  const generators = cache.map(f => f());
-  let gen = null;
+  const generators = cache.map(f => ({ gen: f(), args: null }));
+  let waiting_models = [];
+  let waiting_mids = [];
   let _nxt = null;
-  let _args = null;
+
+  const find_deps_model = (acc, curr) => {
+    if (acc && configs.models.has(curr)) acc[curr] = configs.models.get(curr);
+    else acc = null;
+    return acc;
+  };
+
+  const find_deps_mids = (acc, curr) => {
+    if (acc && configs.middlewares.has(curr))
+      acc[curr] = configs.middlewares.get(curr);
+    else acc = null;
+    return acc;
+  };
+
   while (generators.length) {
-    gen = generators.pop();
-    _nxt = gen.next(_args);
+    let { gen, args } = generators.pop();
+    _nxt = gen.next(args);
+    // Não há mais ações, registro pronto
     if (_nxt.done) continue;
+
     if (is_command(_nxt.value)) {
       switch (_nxt.value.action) {
         case CREATE_MODEL: {
           const { name, schema, statics } = _nxt.value.payload;
+          console.log(`CREATING MODEL - ${name}`);
           if (pre_create_model_cache.has(name)) {
             pre_create_model_cache.get(name).forEach(hook => {
               hook(schema, statics);
@@ -27,12 +50,82 @@ function boot() {
 
           !!statics && (mongoose_schema.statics = statics);
 
-          _args = mongoose.model(name, mongoose_schema);
-          configs.models.set(name, _args);
+          args = mongoose.model(name, mongoose_schema);
+          configs.models.set(name, args);
+          waiting_models = waiting_models.reduce((acc, curr) => {
+            const deps = curr[1].reduce(find_deps_model, {});
+            if (deps !== null) {
+              generators.push({
+                gen: curr[0].gen,
+                args: deps,
+              });
+            } else acc.push(curr);
+
+            return acc;
+          }, []);
+          break;
+        }
+        case DEPENDS_ON_MODEL: {
+          const models = _nxt.value.payload;
+          console.log(`RESOLVING DEPS`, models);
+
+          const deps = models.reduce(find_deps_model, {});
+          if (deps) {
+            args = deps;
+          } else {
+            waiting_models.push([{ gen, args }, _nxt.value.payload]);
+            continue;
+          }
+
+          break;
+        }
+        case CREATE_ROUTE: {
+          const p = _nxt.value.payload;
+          console.log(`CREATING ROUTE - ${p.method.toUpperCase()} ${p.path}`);
+          if (p.middlewares && p.bindthis)
+            configs.app[p.method](p.path, ...p.middlewares, p.handler.bind(p.bindthis));
+          else if (p.middlewares)
+            configs.app[p.method](p.path, ...p.middlewares, p.handler);
+          else if (p.bindthis)
+            configs.app[p.method](p.path, p.handler.bind(p.bindthis));
+          else
+            configs.app[p.method](p.path, p.handler);
+          break;
+        }
+        case CREATE_MIDDLEWARE: {
+          const { name, fn } = _nxt.value.payload;
+          console.log(`CREATING MIDDLEWARE - ${name}`);
+          configs.middlewares.set(name, fn);
+
+          waiting_mids = waiting_mids.reduce((acc, curr) => {
+            const deps = curr[1].reduce(find_deps_mids, {});
+            if (deps !== null) {
+              generators.push({
+                gen: curr[0].gen,
+                args: deps,
+              });
+            } else acc.push(curr);
+
+            return acc;
+          }, []);
+          break;
+        }
+        case DEPENDS_ON_MIDDLEWARE: {
+          const mids = _nxt.value.payload;
+          console.log(`RESOLVING DEPS`, mids);
+
+          const deps = mids.reduce(find_deps_mids, {});
+          if (deps) {
+            args = deps;
+          } else {
+            waiting_mids.push([{ gen, args }, _nxt.value.payload]);
+            continue;
+          }
+
           break;
         }
       }
-      generators.push(gen);
+      generators.push({ gen, args });
     }
   }
 }
