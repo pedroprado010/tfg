@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+const { JWT_KEY } = require('../constants');
+
 const name = 'Account';
 
 const schema = {

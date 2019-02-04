@@ -11,6 +11,16 @@ const {
 } = require('./global-commands/action-types');
 const { pre_create_model_cache } = require('./global-commands/model-commands');
 
+mongoose.connect(
+  'mongodb://mongo:27017/tfg-db',
+  { useNewUrlParser: true },
+  err => {
+    if (err) {
+      console.log('Erro ao conectar ao db');
+    }
+  }
+);
+
 function boot() {
   const generators = cache.map(f => ({ gen: f(), args: null, context: {} }));
   let waiting_models = [];
@@ -60,7 +70,7 @@ function boot() {
               generators.push({
                 gen: curr[0].gen,
                 args: deps,
-                context: curr[0].context,
+                context: { ...curr[0].context, ...deps },
               });
             } else acc.push(curr);
 
@@ -75,7 +85,7 @@ function boot() {
           const deps = models.reduce(find_deps_model, {});
           if (deps) {
             args = deps;
-            context = {...context, ...deps};
+            context = { ...context, ...deps };
           } else {
             waiting_models.push([{ gen, args, context }, _nxt.value.payload]);
             continue;
@@ -85,16 +95,22 @@ function boot() {
         }
         case CREATE_ROUTE: {
           const p = _nxt.value.payload;
-          console.log(`CREATING ROUTE - ${p.method.toUpperCase()} ${p.path}`);
-         if (p.middlewares)
-            configs.app[p.method](p.path, ...p.middlewares, p.handler.bind(context));
-          else
-            configs.app[p.method](p.path, p.handler.bind(context));
+          console.log(
+            `CREATING ROUTE - ${p.method.toUpperCase()} ${p.path}`,
+            Object.keys(context)
+          );
+          if (p.middlewares)
+            configs.app[p.method](
+              p.path,
+              ...p.middlewares,
+              p.handler.bind(context)
+            );
+          else configs.app[p.method](p.path, p.handler.bind(context));
           break;
         }
         case CREATE_MIDDLEWARE: {
           const { name, fn } = _nxt.value.payload;
-          console.log(`CREATING MIDDLEWARE - ${name}`);
+
           configs.middlewares.set(name, fn.bind(context));
 
           waiting_mids = waiting_mids.reduce((acc, curr) => {
@@ -113,12 +129,11 @@ function boot() {
         }
         case DEPENDS_ON_MIDDLEWARE: {
           const mids = _nxt.value.payload;
-          console.log(`RESOLVING DEPS`, mids);
 
           const deps = mids.reduce(find_deps_mids, {});
           if (deps) {
             args = deps;
-            context = {...deps, ...context};
+            context = { ...deps, ...context };
           } else {
             waiting_mids.push([{ gen, args, context }, _nxt.value.payload]);
             continue;
@@ -130,6 +145,10 @@ function boot() {
       generators.push({ gen, args, context });
     }
   }
+
+  configs.app.listen(3000, () => {
+    console.log('Listening port 3000');
+  });
 }
 
 module.exports = boot;

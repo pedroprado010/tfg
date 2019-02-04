@@ -20,7 +20,7 @@ function registerAccount(req, res) {
 function listAccounts(req, res) {
   this.Account.find({}, (err, docs) => {
     if (!err) {
-      res.render('account/list', { accounts: docs });
+      res.json(docs);
     }
   });
 }
@@ -34,7 +34,8 @@ function authenticate(req, res) {
       res.json({ token });
     })
     .catch(error => {
-      res.status(500).json({ error });
+      console.log(error)
+      res.status(500).json({ error: error.message });
     });
 }
 

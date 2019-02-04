@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_KEY = 'SUPER_SECRET';
+const { JWT_KEY } = require('../constants');
 
 const name = 'jwtMiddleware';
 
