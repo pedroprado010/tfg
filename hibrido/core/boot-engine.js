@@ -12,7 +12,7 @@ const {
 const { pre_create_model_cache } = require('./global-commands/model-commands');
 
 function boot() {
-  const generators = cache.map(f => ({ gen: f(), args: null }));
+  const generators = cache.map(f => ({ gen: f(), args: null, context: {} }));
   let waiting_models = [];
   let waiting_mids = [];
   let _nxt = null;
@@ -31,7 +31,7 @@ function boot() {
   };
 
   while (generators.length) {
-    let { gen, args } = generators.pop();
+    let { gen, args, context } = generators.pop();
     _nxt = gen.next(args);
     // Não há mais ações, registro pronto
     if (_nxt.done) continue;
@@ -52,12 +52,15 @@ function boot() {
 
           args = mongoose.model(name, mongoose_schema);
           configs.models.set(name, args);
+          context[name] = args;
+
           waiting_models = waiting_models.reduce((acc, curr) => {
             const deps = curr[1].reduce(find_deps_model, {});
             if (deps !== null) {
               generators.push({
                 gen: curr[0].gen,
                 args: deps,
+                context: curr[0].context,
               });
             } else acc.push(curr);
 
@@ -72,8 +75,9 @@ function boot() {
           const deps = models.reduce(find_deps_model, {});
           if (deps) {
             args = deps;
+            context = {...context, ...deps};
           } else {
-            waiting_models.push([{ gen, args }, _nxt.value.payload]);
+            waiting_models.push([{ gen, args, context }, _nxt.value.payload]);
             continue;
           }
 
@@ -82,20 +86,16 @@ function boot() {
         case CREATE_ROUTE: {
           const p = _nxt.value.payload;
           console.log(`CREATING ROUTE - ${p.method.toUpperCase()} ${p.path}`);
-          if (p.middlewares && p.bindthis)
-            configs.app[p.method](p.path, ...p.middlewares, p.handler.bind(p.bindthis));
-          else if (p.middlewares)
-            configs.app[p.method](p.path, ...p.middlewares, p.handler);
-          else if (p.bindthis)
-            configs.app[p.method](p.path, p.handler.bind(p.bindthis));
+         if (p.middlewares)
+            configs.app[p.method](p.path, ...p.middlewares, p.handler.bind(context));
           else
-            configs.app[p.method](p.path, p.handler);
+            configs.app[p.method](p.path, p.handler.bind(context));
           break;
         }
         case CREATE_MIDDLEWARE: {
           const { name, fn } = _nxt.value.payload;
           console.log(`CREATING MIDDLEWARE - ${name}`);
-          configs.middlewares.set(name, fn);
+          configs.middlewares.set(name, fn.bind(context));
 
           waiting_mids = waiting_mids.reduce((acc, curr) => {
             const deps = curr[1].reduce(find_deps_mids, {});
@@ -103,6 +103,7 @@ function boot() {
               generators.push({
                 gen: curr[0].gen,
                 args: deps,
+                context: curr[0].context,
               });
             } else acc.push(curr);
 
@@ -117,15 +118,16 @@ function boot() {
           const deps = mids.reduce(find_deps_mids, {});
           if (deps) {
             args = deps;
+            context = {...deps, ...context};
           } else {
-            waiting_mids.push([{ gen, args }, _nxt.value.payload]);
+            waiting_mids.push([{ gen, args, context }, _nxt.value.payload]);
             continue;
           }
 
           break;
         }
       }
-      generators.push({ gen, args });
+      generators.push({ gen, args, context });
     }
   }
 }
