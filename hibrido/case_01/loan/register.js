@@ -2,7 +2,9 @@ const LoanHistoricModel = require('./models/loan-historic');
 const routes = require('./routes');
 
 register(function*() {
+  console.log('batata');
   yield create_model(LoanHistoricModel.name, LoanHistoricModel.schema);
+  console.log('arroz');
   yield depends_on_model('Book', 'Exemplar');
   const { jwtMiddleware } = yield depends_on_middleware('jwtMiddleware');
   yield create_route('get', '/loan/:book_id/:exemplar_id', jwtMiddleware ,routes.loanExemplar);

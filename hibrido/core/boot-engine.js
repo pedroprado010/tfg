@@ -11,16 +11,6 @@ const {
 } = require('./global-commands/action-types');
 const { pre_create_model_cache } = require('./global-commands/model-commands');
 
-mongoose.connect(
-  'mongodb://mongo:27017/tfg-db',
-  { useNewUrlParser: true },
-  err => {
-    if (err) {
-      console.log('Erro ao conectar ao db');
-    }
-  }
-);
-
 function boot() {
   const generators = cache.map(f => ({ gen: f(), args: null, context: {} }));
   let waiting_models = [];
@@ -67,6 +57,7 @@ function boot() {
           waiting_models = waiting_models.reduce((acc, curr) => {
             const deps = curr[1].reduce(find_deps_model, {});
             if (deps !== null) {
+              console.log('FOUND DEPS', Object.keys(deps));
               generators.push({
                 gen: curr[0].gen,
                 args: deps,
@@ -80,10 +71,10 @@ function boot() {
         }
         case DEPENDS_ON_MODEL: {
           const models = _nxt.value.payload;
-          console.log(`RESOLVING DEPS`, models);
 
           const deps = models.reduce(find_deps_model, {});
           if (deps) {
+            console.log(`RESOLVING DEPS`, models);
             args = deps;
             context = { ...context, ...deps };
           } else {
@@ -116,6 +107,7 @@ function boot() {
           waiting_mids = waiting_mids.reduce((acc, curr) => {
             const deps = curr[1].reduce(find_deps_mids, {});
             if (deps !== null) {
+              console.log('FOUND DEPS', Object.keys(deps));
               generators.push({
                 gen: curr[0].gen,
                 args: deps,
@@ -132,6 +124,7 @@ function boot() {
 
           const deps = mids.reduce(find_deps_mids, {});
           if (deps) {
+            console.log('RESOLVING DEPS', Object.keys(deps));
             args = deps;
             context = { ...deps, ...context };
           } else {
@@ -145,10 +138,6 @@ function boot() {
       generators.push({ gen, args, context });
     }
   }
-
-  configs.app.listen(3000, () => {
-    console.log('Listening port 3000');
-  });
 }
 
 module.exports = boot;
