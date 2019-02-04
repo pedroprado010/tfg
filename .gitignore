@@ -1,3 +1,4 @@
 node_modules/
 monolitico/data/
 __pycache__
+.env
