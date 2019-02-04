@@ -9,11 +9,11 @@ services:
     links:
       - mongo
     volumes:
-      - ./:/usr/src/app
+      - ../:/usr/src/app
   mongo:
     container_name: mongo
     image: mongo
     volumes:
-      - ../monolitico/data:/data/db
+      - ../../monolitico/data:/data/db
     ports:
       - "27017:27017"
