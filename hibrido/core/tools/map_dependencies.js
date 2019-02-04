@@ -26,6 +26,10 @@ function map_deps() {
     _nxt = gen.next(args);
     // Não há mais ações, registro pronto
     if (_nxt.done) {
+      if (pre_create_model_cache.has(mod_name)) {
+        console.log('MERGING HOOK DEPS OF', mod_name);
+        depends = [...depends, ...pre_create_model_cache.get(mod_name)]
+      }
       mapped_deps.push({ mod_name, resolves, depends, exposes });
       continue;
     }
@@ -34,6 +38,7 @@ function map_deps() {
       switch (_nxt.value.action) {
         case CREATE_MODEL: {
           const { name } = _nxt.value.payload;
+          pre_create_model_cache
           resolves.push(name);
           break;
         }

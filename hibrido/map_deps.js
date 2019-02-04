@@ -1,3 +1,4 @@
+require('dotenv').load();
 const load_services = require('./core/load-services');
 const path = require('path');
 

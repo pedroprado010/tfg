@@ -10,7 +10,7 @@ const loan_module = register('loan-module',function*() {
   yield register.route('get', '/loan', jwtMiddleware ,routes.listLoans);
 });
 
-loan_module.hook.pre_create_model('Exemplar', (schema, statics) => {
+loan_module.pre_create_model_hook('Exemplar', (schema, statics) => {
   schema.loaned = {
     type: Boolean,
     default: false,
