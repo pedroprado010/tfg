@@ -1,18 +1,16 @@
 const LoanHistoricModel = require('./models/loan-historic');
 const routes = require('./routes');
 
-register(function*() {
-  console.log('batata');
-  yield create_model(LoanHistoricModel.name, LoanHistoricModel.schema);
-  console.log('arroz');
-  yield depends_on_model('Book', 'Exemplar');
-  const { jwtMiddleware } = yield depends_on_middleware('jwtMiddleware');
-  yield create_route('get', '/loan/:book_id/:exemplar_id', jwtMiddleware ,routes.loanExemplar);
-  yield create_route('put', '/loan/:book_id/:exemplar_id', jwtMiddleware ,routes.returnExemplar);
-  yield create_route('get', '/loan', jwtMiddleware ,routes.listLoans);
+const loan_module = register('loan-module',function*() {
+  yield register.model(LoanHistoricModel.name, LoanHistoricModel.schema);
+  yield register.depends_on_model('Book', 'Exemplar');
+  const { jwtMiddleware } = yield register.depends_on_middleware('jwtMiddleware');
+  yield register.route('get', '/loan/:book_id/:exemplar_id', jwtMiddleware ,routes.loanExemplar);
+  yield register.route('put', '/loan/:book_id/:exemplar_id', jwtMiddleware ,routes.returnExemplar);
+  yield register.route('get', '/loan', jwtMiddleware ,routes.listLoans);
 });
 
-pre_create_model('Exemplar', (schema, statics) => {
+loan_module.hook.pre_create_model('Exemplar', (schema, statics) => {
   schema.loaned = {
     type: Boolean,
     default: false,

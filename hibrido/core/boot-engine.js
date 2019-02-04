@@ -12,7 +12,7 @@ const {
 const { pre_create_model_cache } = require('./global-commands/model-commands');
 
 function boot() {
-  const generators = cache.map(f => ({ gen: f(), args: null, context: {} }));
+  const generators = cache.map(m => ({ gen: m.fn(), args: null, context: {} }));
   let waiting_models = [];
   let waiting_mids = [];
   let _nxt = null;

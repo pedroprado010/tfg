@@ -2,10 +2,10 @@ const AccountModel = require('./models/account');
 const jwtMiddleware = require('./middlewares/jwt-middleware');
 const routes = require('./routes');
 
-register(function*() {
-  yield create_model(AccountModel.name, AccountModel.schema, AccountModel.statics);
-  yield create_middleware(jwtMiddleware.name, jwtMiddleware.callable);
-  yield create_route('post', '/account/register', routes.registerAccount);
-  yield create_route('get', '/account', routes.listAccounts);
-  yield create_route('post', '/account/login', routes.authenticate);
+register('account-module',function*() {
+  yield register.model(AccountModel.name, AccountModel.schema, AccountModel.statics);
+  yield register.middleware(jwtMiddleware.name, jwtMiddleware.callable);
+  yield register.route('post', '/account/register', routes.registerAccount);
+  yield register.route('get', '/account', routes.listAccounts);
+  yield register.route('post', '/account/login', routes.authenticate);
 });

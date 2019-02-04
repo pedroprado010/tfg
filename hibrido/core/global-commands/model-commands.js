@@ -2,14 +2,14 @@ const { CREATE_MODEL, DEPENDS_ON_MODEL } = require('./action-types');
 
 const pre_create_model_cache = new Map();
 
-global.create_model = function(name, schema, statics) {
+function create_model(name, schema, statics) {
   return {
     action: CREATE_MODEL,
     payload: { name, schema, statics },
   };
-};
+}
 
-global.pre_create_model = function(name, hook) {
+function pre_create_model(name, hook) {
   let hooks = null;
   if (pre_create_model_cache.has(name)) {
     hooks = [...pre_create_model_cache.get(name), hook];
@@ -17,13 +17,18 @@ global.pre_create_model = function(name, hook) {
     hooks = [hook];
   }
   pre_create_model_cache.set(name, hooks);
-};
+}
 
-global.depends_on_model = function(...names) {
+function depends_on_model(...names) {
   return {
     action: DEPENDS_ON_MODEL,
     payload: names,
   };
-};
+}
 
-module.exports = { pre_create_model_cache };
+module.exports = {
+  depends_on_model,
+  pre_create_model,
+  create_model,
+  pre_create_model_cache,
+};
