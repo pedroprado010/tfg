@@ -1,9 +1,7 @@
-const load_services = require('../../core/load-services');
+const run = require('../../core');
 const path = require('path');
 
-const boot = require('../../core/boot-engine');
-const start_network = require('../../core/start-network');
-
-load_services(path.resolve(__dirname, './'))
-  .then(boot)
-  .then(start_network);
+run({
+  mongo_url: 'mongodb://mongo:27017/tfg-db',
+  services_dir: path.resolve(__dirname, './'),
+});
