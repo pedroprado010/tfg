@@ -101,8 +101,8 @@ function boot() {
         }
         case CREATE_MIDDLEWARE: {
           const { name, fn } = _nxt.value.payload;
-
-          configs.middlewares.set(name, fn.bind(context));
+          args = fn.bind(context);
+          configs.middlewares.set(name, args);
 
           waiting_mids = waiting_mids.reduce((acc, curr) => {
             const deps = curr[1].reduce(find_deps_mids, {});
