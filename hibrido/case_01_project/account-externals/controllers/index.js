@@ -9,11 +9,15 @@ function registerAccount(req, res) {
       res.json({ email: account.email });
     })
     .catch(e => {
-      res.status(500).json({
+      res.status(500);
+      if (e.errors && typeof e.error === 'array') {
+        return res.json({
         error: Object.getOwnPropertyNames(e.errors).reduce((acc, curr) => {
           return [...acc, e.errors[curr].message];
         }, []),
       });
+      }
+      res.json({error: 'falha no cadastro.'});
     });
 }
 
