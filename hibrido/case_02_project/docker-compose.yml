@@ -2,8 +2,7 @@ version: '3'
 services:
   reverse_proxy:
     depends_on:
-      - account_app
-      - books_app
+      - book_account_app
       - loan_app
     image: nginx:1.15.8
     volumes:
@@ -12,13 +11,13 @@ services:
       - 80:80
       - 443:443
   book_account_app:
-    build: ./book-account-app
+    build: ./book-account-app/
     expose:
       - "3000"
     volumes:
       - ../:/usr/src/app
   loan_app:
-    build: ./loan-app
+    build: ./loan-app/
     expose:
       - "3000"
     volumes:

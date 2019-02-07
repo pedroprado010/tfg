@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "case_01": "npx nodemon ./case_01_project"
+    "case_01": "npx nodemon ./case_01_project",
+    "case_02_book_account_app": "npx nodemon ./case_02_project/book-account-app/index.js",
+    "case_02_loan_app": "npx nodemon ./case_02_project/loan-app/index.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
