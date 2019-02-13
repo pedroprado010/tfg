@@ -14,6 +14,7 @@ const authMiddleware = require('./lib/jwt-middleware');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 mongoose.connect(
   'mongodb://mongo:27017/tfg-db',

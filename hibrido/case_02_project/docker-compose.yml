@@ -16,12 +16,16 @@ services:
       - "3000"
     volumes:
       - ../:/usr/src/app
+    links:
+      - mongo
   loan_app:
     build: ./loan-app/
     expose:
       - "3000"
     volumes:
       - ../:/usr/src/app
+    links:
+      - mongo
   mongo:
     container_name: mongo
     image: mongo

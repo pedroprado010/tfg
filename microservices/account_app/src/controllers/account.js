@@ -3,7 +3,6 @@ const Account = require('../models/account');
 const JWT_KEY = require('../lib/constants').JWT_KEY;
 
 function registerAccount(req, res) {
-  console.log(req.body);
   const account = new Account({
     email: req.body.email,
     password: req.body.pwd,

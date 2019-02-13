@@ -7,7 +7,7 @@ const models = new Map();
 const middlewares = new Map();
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.json());
 function authMiddleware(req, res, next) {
   if (!req.headers.authorization)
     return res.status(403).json({ error: 'Credenciais não enviadas.' });

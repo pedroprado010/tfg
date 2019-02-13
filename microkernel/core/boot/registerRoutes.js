@@ -2,7 +2,7 @@ const express = require('express');
 const configs = require('./configs');
 
 function registerAccount(req, res) {
-  const account = new configs.models.get('Account')({
+  const account = new (configs.models.get('Account'))({
     email: req.body.email,
     password: req.body.pwd,
   });
@@ -63,7 +63,7 @@ function listBooks(req, res) {
         });
         Promise.all(_q)
           .then(r => {
-            res.json(docs);
+            res.json({docs});
           })
           .catch(err => {
             console.log(err);
@@ -77,10 +77,10 @@ function listExemplars(req, res) {
   configs.models
     .get('Book')
     .findById(req.params.book_id, {}, { lean: true })
-    .exec()
     .then(book => {
-      if (!book)
+      if (!book) {
         return res.status(404).json({ error: 'Livro não cadastrado.' });
+      }
       configs.models
         .get('Exemplar')
         .find({ book_id: req.params.book_id }, '-book_id')

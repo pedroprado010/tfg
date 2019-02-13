@@ -6,7 +6,7 @@ const app = express();
 const accountControler = require('./controllers/account');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.json());
 mongoose.connect(
   'mongodb://mongo:27017/tfg-db',
   { useNewUrlParser: true },
