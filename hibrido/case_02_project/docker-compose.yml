@@ -11,6 +11,9 @@ services:
       - 80:80
       - 443:443
   book_account_app:
+    depends_on:
+      - mongo
+    container_name: book_account_app
     build: ./book-account-app/
     expose:
       - "3000"
@@ -19,6 +22,9 @@ services:
     links:
       - mongo
   loan_app:
+    depends_on:
+      - mongo
+    container_name: loan_app
     build: ./loan-app/
     expose:
       - "3000"

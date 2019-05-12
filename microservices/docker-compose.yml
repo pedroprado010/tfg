@@ -12,23 +12,32 @@ services:
       - 80:80
       - 443:443
   account_app:
+    container_name: account_app
     build: ./account_app
     expose:
       - "3000"
     volumes:
       - ./account_app:/usr/src/app
+    depends_on:
+      - mongo
   books_app:
+    container_name: books_app
     build: ./books_app
     expose:
       - "3000"
     volumes:
       - ./books_app:/usr/src/app
+    depends_on:
+      - mongo
   loan_app:
+    container_name: loan_app
     build: ./loan_app
     expose:
       - "3000"
     volumes:
       - ./loan_app:/usr/src/app
+    depends_on:
+      - mongo
   mongo:
     container_name: mongo
     image: mongo
