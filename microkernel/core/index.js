@@ -11,15 +11,17 @@ mongoose.connect(
   err => {
     if (err) {
       console.log('Erro ao conectar ao db');
+    } else {
+      loadPlugins()
+        .then(registerSchemas)
+        .then(compileModels)
+        .then(registerRoutes)
+        .then(app => {
+          app.listen(3000);
+        });
     }
   }
 );
 
-loadPlugins()
-  .then(registerSchemas)
-  .then(compileModels)
-  .then(registerRoutes)
-  .then(app => {
-    app.listen(3000);
-  });
+
 
