@@ -13,6 +13,11 @@
             <stringProp name="Argument.value">3000</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="app_host" elementType="Argument">
+            <stringProp name="Argument.name">app_host</stringProp>
+            <stringProp name="Argument.value">18.218.146.96</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
@@ -24,7 +29,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">500</stringProp>
+        <stringProp name="ThreadGroup.num_threads">100</stringProp>
         <stringProp name="ThreadGroup.ramp_time">15</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
@@ -51,7 +56,7 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">${app_host}</stringProp>
           <stringProp name="HTTPSampler.port">${app_port}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
@@ -153,7 +158,7 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">${app_host}</stringProp>
           <stringProp name="HTTPSampler.port">${app_port}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
@@ -196,7 +201,7 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">${app_host}</stringProp>
           <stringProp name="HTTPSampler.port">${app_port}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
@@ -222,7 +227,7 @@
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">${app_host}</stringProp>
           <stringProp name="HTTPSampler.port">${app_port}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
@@ -290,7 +295,7 @@
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.domain">${app_host}</stringProp>
           <stringProp name="HTTPSampler.port">${app_port}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
@@ -433,7 +438,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/home/icek/projects/personal/tfg/test/result_001.csv</stringProp>
+        <stringProp name="filename">/home/icek/Área de Trabalho/testes-2/microkernel-100.jmx</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>

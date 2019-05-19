@@ -40,7 +40,6 @@ accountSchema.statics.login = function(email, password) {
     this.findOne({ email, password })
       .exec()
       .then(usr => {
-        console.log(usr);
         if (!usr) return reject('Senha ou Email inválido.');
         const token = jwt.sign({ id: usr._id }, JWT_KEY, { expiresIn: '1h' });
         resolve(token);

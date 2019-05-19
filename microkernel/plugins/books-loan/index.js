@@ -97,7 +97,6 @@ function listLoans(req, res) {
 }
 
 function preCompileModels(models) {
-  // models.get('Exemplar').eachPath(p => console.log(p));
   models.get('Exemplar').add({
     loaned: {
       type: Boolean,
@@ -151,8 +150,7 @@ function registerRoutes(router, models, middlewares) {
 }
 
 function postCompileModels(models) {
-  // console.log('------');
-  // models.get('Exemplar').schema.eachPath(p => console.log(p));
+
 }
 
 module.exports = {
