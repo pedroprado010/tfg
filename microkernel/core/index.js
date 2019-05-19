@@ -6,7 +6,7 @@ const compileModels = require('./boot/compileModels');
 const registerRoutes = require('./boot/registerRoutes');
 
 mongoose.connect(
-  'mongodb://mongo:27017/tfg-db',
+  `mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/tfg-db`,
   { useNewUrlParser: true },
   err => {
     if (err) {
