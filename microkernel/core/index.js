@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const loadPlugins = require('./boot/loadPlugins');
 const registerSchemas = require('./boot/registerSchemas');
