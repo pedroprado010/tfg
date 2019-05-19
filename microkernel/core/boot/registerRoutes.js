@@ -11,12 +11,8 @@ function registerAccount(req, res) {
     .then(account => {
       res.json({ email: account.email });
     })
-    .catch(e => {
-      res.status(500).json({
-        error: Object.getOwnPropertyNames(e.errors).reduce((acc, curr) => {
-          return [...acc, e.errors[curr].message];
-        }, []),
-      });
+    .catch(error => {
+      res.status(500).json({error});
     });
 }
 
