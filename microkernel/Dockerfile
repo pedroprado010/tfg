@@ -5,4 +5,6 @@ WORKDIR /usr/src/app
 # RUN npm install
 # COPY . /usr/src/app/
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["npm", "install", "pm2", "-g"]
+CMD ["npm", "install"]
+CMD ["pm2", "start", "./core/index.js"]
