@@ -7,4 +7,4 @@ WORKDIR /usr/src/app
 EXPOSE 3000
 CMD ["npm", "install", "pm2", "-g"]
 CMD ["npm", "install"]
-CMD ["pm2", "start", "./core/index.js"]
+CMD ["pm2", "start", "/usr/src/app/core/index.js"]
