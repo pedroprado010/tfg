@@ -26,6 +26,7 @@ function loanExemplar(req, res) {
       res.json({ loan: results[0], exemplar: results[1] });
     })
     .catch(error => {
+      console.log(error);
       res.status(500);
       if (error) return res.json({ error: error.message || error });
 
@@ -66,10 +67,11 @@ function returnExemplar(req, res) {
       ]);
     })
     .then(result => {
-      console.log(result);
       res.json({ loan: result[0], exemplar: result[1] });
     })
     .catch(error => {
+      console.log(error);
+
       res.status(500);
       if (error) return res.json({ error: error.message || error });
 
