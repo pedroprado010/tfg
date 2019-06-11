@@ -15,7 +15,7 @@
           </elementProp>
           <elementProp name="app_host" elementType="Argument">
             <stringProp name="Argument.name">app_host</stringProp>
-            <stringProp name="Argument.value">18.218.146.96</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -29,7 +29,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">300</stringProp>
         <stringProp name="ThreadGroup.ramp_time">15</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
@@ -438,7 +438,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/home/icek/Área de Trabalho/testes-2/microkernel-100.jmx</stringProp>
+        <stringProp name="filename">/home/icek/Área de Trabalho/testes-2/text-10.jmx</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
